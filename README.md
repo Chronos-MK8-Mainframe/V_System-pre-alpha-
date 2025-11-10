@@ -193,7 +193,7 @@ Instagram Username:
 ```
 itz1input
 ```
-## workers;
+## Our team
 
 - clanker 1 = claude
 - clanker 2 = none(as no one is better than claude at understanding code context and "actaully" sovling problums.)
