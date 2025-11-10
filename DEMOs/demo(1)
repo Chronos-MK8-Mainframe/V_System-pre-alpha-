@@ -1,0 +1,218 @@
+"""Complete demonstration of V' system"""
+
+from v_system import (
+    Var, Num, Add, Mul, Sub,
+    Context, VPrimePipeline, MetaEvolutionEngine
+)
+
+
+def main():
+    print("="*70)
+    print(" V' SYSTEM - MODULAR IMPLEMENTATION DEMO")
+    print("="*70)
+    
+    # ========================================================================
+    # PART 1: BASIC PIPELINE EXECUTION
+    # ========================================================================
+    
+    print("\n" + "="*70)
+    print(" PART 1: BASIC TRANSFORMS")
+    print("="*70)
+    
+    # Create pipeline
+    pipeline = VPrimePipeline(num_layers=2, nodes_per_layer=2)
+    
+    # Test cases
+    test_cases = [
+        (Add(Var('x'), Num(0)), "x", "Identity addition: x + 0 → x"),
+        (Add(Num(0), Var('y')), "y", "Identity addition (rev): 0 + y → y"),
+        (Mul(Var('a'), Num(1)), "a", "Identity multiplication: a * 1 → a"),
+        (Mul(Num(1), Var('b')), "b", "Identity multiplication (rev): 1 * b → b"),
+        (Mul(Var('c'), Num(0)), "0", "Zero multiplication: c * 0 → 0"),
+        (Mul(Num(0), Var('d')), "0", "Zero multiplication (rev): 0 * d → 0"),
+    ]
+    
+    passed = 0
+    for input_expr, expected, description in test_cases:
+        result = pipeline.execute(input_expr)
+        actual = str(result.main)
+        
+        if actual == expected:
+            print(f"✅ {description}")
+            print(f"   Input: {input_expr} → Output: {actual}")
+            passed += 1
+        else:
+            print(f"❌ {description}")
+            print(f"   Input: {input_expr}")
+            print(f"   Expected: {expected}, Got: {actual}")
+    
+    print(f"\n📊 Results: {passed}/{len(test_cases)} tests passed")
+    
+    # ========================================================================
+    # PART 2: META-EVOLUTION ENGINE
+    # ========================================================================
+    
+    print("\n\n" + "="*70)
+    print(" PART 2: META-EVOLUTION ENGINE")
+    print("="*70)
+    
+    # Initialize MeE
+    mee = MetaEvolutionEngine(pipeline)
+    
+    print(f"\n📚 MeE initialized with {len(mee.R_global)} core rules")
+    
+    # Test global broadcast
+    print("\n🌐 Testing Global Broadcast...")
+    
+    from v_system import Rule
+    
+    test_rule = Rule(
+        rule_id="demo_global_rule",
+        condition=lambda expr, ctx, refs: 0,
+        transform=lambda expr: expr,
+        domain=Context("math", "algebra"),
+        priority=10,
+        confidence=1.0,
+        source="demo"
+    )
+    
+    broadcast_result = mee.broadcast_global_rule(test_rule)
+    print(f"   Nodes updated: {broadcast_result['nodes_updated']}/{broadcast_result['total_nodes']}")
+    
+    # ========================================================================
+    # PART 3: LEARNING FROM EXAMPLES
+    # ========================================================================
+    
+    print("\n\n" + "="*70)
+    print(" PART 3: LEARNING FROM MINIMAL EXAMPLES")
+    print("="*70)
+    
+    # Minimal training data (3-5 examples)
+    training_examples = [
+        {
+            "input": Add(Var('x'), Num(0)),
+            "output": Var('x'),
+            "context": Context("math", "algebra"),
+            "description": "Identity addition"
+        },
+        {
+            "input": Mul(Var('y'), Num(1)),
+            "output": Var('y'),
+            "context": Context("math", "algebra"),
+            "description": "Identity multiplication"
+        },
+        {
+            "input": Mul(Var('z'), Num(0)),
+            "output": Num(0),
+            "context": Context("math", "algebra"),
+            "description": "Zero multiplication"
+        }
+    ]
+    
+    print(f"\n📖 Training with {len(training_examples)} examples:")
+    for i, ex in enumerate(training_examples):
+        print(f"   {i+1}. {ex['input']} → {ex['output']} ({ex['description']})")
+    
+    learning_result = mee.learn_from_examples(training_examples)
+    
+    print(f"\n📊 Learning Results:")
+    print(f"   Rules learned: {learning_result['rules_learned']}")
+    print(f"   Rules distributed: {learning_result['rules_distributed']}")
+    print(f"   Avg confidence: {learning_result['confidence_avg']:.2f}")
+    
+    # ========================================================================
+    # PART 4: SYSTEM STATISTICS
+    # ========================================================================
+    
+    print("\n\n" + "="*70)
+    print(" PART 4: SYSTEM STATISTICS")
+    print("="*70)
+    
+    stats = mee.get_stats()
+    
+    print(f"\n🧠 MeE Statistics:")
+    for key, value in stats.items():
+        if isinstance(value, float):
+            print(f"   {key}: {value:.2f}")
+        else:
+            print(f"   {key}: {value}")
+    
+    print(f"\n🗂️  Pipeline Statistics:")
+    print(f"   Total V' nodes: {len(pipeline.get_all_nodes())}")
+    print(f"   Layers: {len(pipeline.layers)}")
+    print(f"   Alignment checkers: {len(pipeline.alignment_checkers)}")
+    
+    print(f"\n📋 Per-Node Statistics:")
+    for node in pipeline.get_all_nodes():
+        print(f"   {node.node_id}:")
+        print(f"      Local rules: {len(node.R_local)}")
+        print(f"      Updates received: {len(node.update_log)}")
+        print(f"      Transformations: {len(node.application_log)}")
+    
+    # ========================================================================
+    # PART 5: COMPLEX EXPRESSION
+    # ========================================================================
+    
+    print("\n\n" + "="*70)
+    print(" PART 5: COMPLEX EXPRESSION")
+    print("="*70)
+    
+    # Complex expression: ((x * 1) + 0) * 1
+    complex_expr = Mul(Add(Mul(Var('x'), Num(1)), Num(0)), Num(1))
+    
+    print(f"\nInput: {complex_expr}")
+    print(f"Expected: x (after multiple rule applications)")
+    
+    result = pipeline.execute(complex_expr)
+    
+    print(f"\nFinal output: {result.main}")
+    
+    if result.metadata.get("rules_applied"):
+        print(f"Rules applied: {', '.join(result.metadata['rules_applied'])}")
+    
+    # ========================================================================
+    # SUMMARY
+    # ========================================================================
+    
+    print("\n\n" + "="*70)
+    print(" DEMO COMPLETE!")
+    print("="*70)
+    
+    print("\n✅ Demonstrated Features:")
+    features = [
+        "1. Basic symbolic transformations (identity, zero rules)",
+        "2. Multi-layer V' pipeline execution",
+        "3. Context inference from expressions",
+        "4. Global broadcast to all V' nodes",
+        "5. Learning from minimal examples (3-5)",
+        "6. Rule distribution and updates",
+        "7. Complete system traceability",
+        "8. Statistics and monitoring"
+    ]
+    
+    for feature in features:
+        print(f"   {feature}")
+    
+    print("\n📦 Modular Architecture:")
+    modules = [
+        "v_system/core/       - Core data structures",
+        "v_system/vprime/     - V' nodes and pipeline",
+        "v_system/mee/        - Meta-Evolution Engine",
+        "v_system/rules/      - Rule libraries",
+        "tests/               - Unit and integration tests",
+        "examples/            - Demonstrations"
+    ]
+    
+    for module in modules:
+        print(f"   {module}")
+    
+    print("\n🚀 Ready for:")
+    print("   - Option B enhancements (advanced learning)")
+    print("   - Reddit post with working demo")
+    print("   - Further development and benchmarking")
+    
+    print("\n" + "="*70)
+
+
+if __name__ == "__main__":
+    main()
