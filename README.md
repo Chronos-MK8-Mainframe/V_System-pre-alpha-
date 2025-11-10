@@ -195,7 +195,7 @@ itz1input
 ```
 ## workers;
 
-clanker 1 = claude
-clanker 2 = none(as no one is better than claude at understanding code context and "actaully" sovling problums.)
-human 1   = itz1input(aka Chronos-mainframe, yes im the same person.)
-human 2   = none(im lonly & broke to hire any one.)
+- clanker 1 = claude
+- clanker 2 = none(as no one is better than claude at understanding code context and "actaully" sovling problums.)
+- human 1   = itz1input(aka Chronos-mainframe, yes im the same person.)
+- human 2   = none(im lonly & broke to hire any one.)
